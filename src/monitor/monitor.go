@@ -64,6 +64,7 @@ func JsonrpcMonitor() {
 	}
 
 	for _, serviceName := range servicesChildren {
+		// Check JsonRpc Alive
 		utils.Trace("------------------")
 		utils.Trace(fmt.Sprintf("Start Check Service '%s' ", serviceName))
 		service, err := GetService(zkConn, servicesPath, serviceName)
