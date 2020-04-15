@@ -1,5 +1,6 @@
-# zookeeper-monitor
-Zookeeper Monitor
+# Zookeeper Monitor
+
+Zookeeper Monitor 针对 Hyperf 框架服务治理组件，Zookeeper驱动组件服务注册信息监控。
 
 ### 依赖类库
 
