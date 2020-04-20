@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	ServicesCheckPath, _     = utils.GetOption("ServicesCheckPath", "zookeeper")
-	ServicesPath, _          = utils.GetOption("ServicesPath", "zookeeper")
-	DefaultServicesCheckPath = "/hyperf/jsonrpc/checks"
-	TimeFormat               = "2006-01-02 15:04:05"
+	ServicesCheckPath, _              = utils.GetOption("ServicesCheckPath", "zookeeper")
+	ServicesPath, _                   = utils.GetOption("ServicesPath", "zookeeper")
+	DefaultServicesCheckPath          = "/hyperf/jsonrpc/checks"
+	TimeFormat                        = "2006-01-02 15:04:05"
+	ZkConnection             *zk.Conn = nil
 )
 
 type JsonRpc struct {
@@ -28,7 +29,7 @@ type JsonRpc struct {
 	CheckTime                      string
 }
 
-func JsonrpcMonitor() {
+func init() {
 	servers, err := utils.GetOption("Servers", "zookeeper")
 	if err != nil {
 		utils.Errors(fmt.Sprintf("%+v", err))
@@ -49,6 +50,15 @@ func JsonrpcMonitor() {
 		utils.Errors(fmt.Sprintf("%+v", err))
 		return
 	}
+	utils.Trace("============= Init Zk Connection ... =============")
+	ZkConnection = zkConn
+}
+
+func JsonrpcMonitor() {
+	if ZkConnection == nil {
+		utils.Errors("Zookeeper Connection Error: invalid connection!")
+		return
+	}
 
 	// 获取存储服务的目录
 	servicesPath, err := utils.GetOption("ServicesPath", "zookeeper")
@@ -57,7 +67,7 @@ func JsonrpcMonitor() {
 		return
 	}
 
-	servicesChildren, err := GetServicesPath(zkConn, servicesPath)
+	servicesChildren, err := GetServicesPath(ZkConnection, servicesPath)
 	if err != nil {
 		utils.Errors(fmt.Sprintf("%+v", err))
 		return
@@ -67,7 +77,7 @@ func JsonrpcMonitor() {
 		// Check JsonRpc Alive
 		utils.Trace("------------------")
 		utils.Trace(fmt.Sprintf("Start Check Service '%s' ", serviceName))
-		service, err := GetService(zkConn, servicesPath, serviceName)
+		service, err := GetService(ZkConnection, servicesPath, serviceName)
 
 		if err != nil {
 			utils.Errors(fmt.Sprintf("%+v", err))
@@ -75,7 +85,7 @@ func JsonrpcMonitor() {
 		}
 
 		// Check JsonRpc Alive
-		CheckJsonrpcAlive(zkConn, service)
+		CheckJsonrpcAlive(ZkConnection, service)
 		utils.Trace("===============")
 	}
 }

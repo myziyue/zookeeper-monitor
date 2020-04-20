@@ -27,7 +27,7 @@ func GetServicesPath(zkConnect *zk.Conn, servicesPath string) ([]string, error) 
 	// 获取存储服务下的子目录
 	children, _, err := zkConnect.Children(servicesPath)
 	if err != nil {
-		utils.Errors(fmt.Sprintf("%+v", err))
+		utils.Errors(fmt.Sprintf("%+v (%s)", err, servicesPath))
 		return []string{}, err
 	}
 	return children, err
@@ -48,7 +48,7 @@ func GetService(zkConnect *zk.Conn, servicesPath string, serviceName string) (st
 	// get service content
 	value, _, err := zkConnect.Get(servicesPath)
 	if err != nil {
-		utils.Errors(fmt.Sprintf("%+v", err))
+		utils.Errors(fmt.Sprintf("%+v (%s)", err, servicesPath))
 		return "", err
 	}
 
@@ -75,13 +75,13 @@ func SetService(zkConnect *zk.Conn, servicesPath string, servicesName string, se
 
 	exists, stat, err := zkConnect.Exists(servicesPath)
 	if err != nil {
-		utils.Warning(fmt.Sprintf("%+v(%s)", err, servicesPath))
+		utils.Warning(fmt.Sprintf("%+v (%s)", err, servicesPath))
 		return false, err
 	}
 	if exists == false {
 		_, err := MakeNodes(zkConnect, servicesPath)
 		if err != nil {
-			utils.Errors(fmt.Sprintf("%+v", err))
+			utils.Errors(fmt.Sprintf("%+v (%s)", err, servicesPath))
 			return false, err
 		}
 	}
@@ -102,7 +102,7 @@ func DeleteService(zkConnect *zk.Conn, servicesPath string, servicesName string)
 
 	exists, stat, err := zkConnect.Exists(servicesPath)
 	if err != nil {
-		utils.Warning(fmt.Sprintf("%+v(%s)", err, servicesPath))
+		utils.Warning(fmt.Sprintf("%+v (%s)", err, servicesPath))
 		return true
 	}
 	if exists == false {
