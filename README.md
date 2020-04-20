@@ -39,3 +39,10 @@ SET GOOS=linux
 SET GOARCH=amd64
 go build -o bin/zookeeper-monitor-linux-x86_64 src/main.go
 ```
+
+### 运行
+
+以Linux为例：
+```bash
+# ./bin/zookeeper-monitor-linux-x86_64
+```
